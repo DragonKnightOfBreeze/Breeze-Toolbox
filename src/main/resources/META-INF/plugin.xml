@@ -1,0 +1,27 @@
+<idea-plugin>
+  <id>icu.windea.breeze.toolbox</id>
+  <name>Breeze Toolbox</name>
+  <category></category>
+
+  <vendor email="dk_breeze@qq.com" url="https://github.com/DragonKnightOfBreeze">DragonKnightOfBreeze</vendor>
+  
+  <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.java</depends>
+  <depends>com.intellij.java-i18n</depends>
+  <depends>com.intellij.properties</depends>
+  <depends>org.jetbrains.kotlin</depends>
+
+  <resource-bundle>messages.BreezeBundle</resource-bundle>
+  
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="icu.windea.breeze.toolbox.settings.BreezeCodeFoldingSettings"/>
+    <codeFoldingOptionsProvider instance="icu.windea.breeze.toolbox.settings.BreezeCodeFoldingOptionsProvider"/>
+
+    <lang.foldingBuilder language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nNameAnnotatedReferenceFoldingBuilder" order="first"/>
+    <lang.foldingBuilder language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nMessageFoldingBuilder" order="first"/>
+    <codeInsight.lineMarkerProvider language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nMessageLineMarkerProvider" order="first"/>
+
+    <lang.documentationProvider language="Properties" implementationClass="icu.windea.breeze.toolbox.editor.PropertiesDocumentationProvider" order="first"/>
+    <enterHandlerDelegate implementation="icu.windea.breeze.toolbox.editor.EnterInPropertiesFileHandler" order="first"/>
+  </extensions>
+</idea-plugin>
