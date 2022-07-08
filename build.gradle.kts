@@ -11,7 +11,6 @@ version = "0.1.0"
 intellij {
 	version.set("2021.3")
 	pluginName.set("Breeze Toolbox")
-	type.set("IC")
 	plugins.set(listOf("java", "java-i18n", "properties", "org.jetbrains.kotlin"))
 }
 
