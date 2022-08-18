@@ -17,11 +17,11 @@
     <applicationService serviceImplementation="icu.windea.breeze.toolbox.settings.BreezeCodeFoldingSettings"/>
     <codeFoldingOptionsProvider instance="icu.windea.breeze.toolbox.settings.BreezeCodeFoldingOptionsProvider"/>
 
-    <lang.foldingBuilder language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nNameAnnotatedReferenceFoldingBuilder" order="first"/>
-    <lang.foldingBuilder language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nMessageFoldingBuilder" order="first"/>
-    <codeInsight.lineMarkerProvider language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nMessageLineMarkerProvider" order="first"/>
+    <enterHandlerDelegate implementation="icu.windea.breeze.toolbox.codeInsight.EnterInPropertiesFileHandler" order="first"/>
+    <codeInsight.lineMarkerProvider language="UAST" implementationClass="icu.windea.breeze.toolbox.codeInsight.I18nMessageLineMarkerProvider" order="first"/>
 
     <lang.documentationProvider language="Properties" implementationClass="icu.windea.breeze.toolbox.editor.PropertiesDocumentationProvider" order="first"/>
-    <enterHandlerDelegate implementation="icu.windea.breeze.toolbox.editor.EnterInPropertiesFileHandler" order="first"/>
+    <lang.foldingBuilder language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nNameAnnotatedReferenceFoldingBuilder" order="first"/>
+    <lang.foldingBuilder language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nMessageFoldingBuilder" order="first"/>
   </extensions>
 </idea-plugin>

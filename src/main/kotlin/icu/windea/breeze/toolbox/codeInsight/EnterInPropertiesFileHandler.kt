@@ -1,4 +1,4 @@
-package icu.windea.breeze.toolbox.editor
+package icu.windea.breeze.toolbox.codeInsight
 
 import com.intellij.codeInsight.editorActions.enter.*
 import com.intellij.lang.properties.PropertiesUtil

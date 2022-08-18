@@ -1,11 +1,10 @@
-package icu.windea.breeze.toolbox.editor
+package icu.windea.breeze.toolbox.codeInsight
 
 import com.intellij.codeInsight.daemon.*
 import com.intellij.lang.properties.*
 import com.intellij.openapi.editor.markup.*
 import com.intellij.openapi.progress.*
 import com.intellij.psi.*
-import icu.windea.breeze.*
 import icu.windea.breeze.toolbox.*
 import org.jetbrains.uast.*
 
@@ -26,9 +25,19 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 			val targetElement = expression.sourcePsi?.firstChild ?: continue
 			if(!expression.isI18nProperty()) continue
 			val property = expression.getI18nProperty() ?: continue
-			val text = property.value?.handleHtmlI18nPropertyValue() ?: continue
+			val text = renderText(property) ?: continue
 			val lineMarkerInfo = createLineMarkerInfo(targetElement, text, property)
 			result.add(lineMarkerInfo)
+		}
+	}
+	
+	private fun renderText(property: IProperty): String?{
+		val key = property.name ?: return null
+		val value = property.value ?: return null
+		return buildString {
+			append("<b>").append(key).append("</b>")
+			append("<br>")
+			append(value.handleHtmlI18nPropertyValue())
 		}
 	}
 	

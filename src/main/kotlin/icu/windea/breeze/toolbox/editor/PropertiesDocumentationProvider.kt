@@ -3,7 +3,6 @@ package icu.windea.breeze.toolbox.editor
 import com.intellij.lang.documentation.*
 import com.intellij.lang.properties.psi.*
 import com.intellij.psi.*
-import icu.windea.breeze.*
 import icu.windea.breeze.toolbox.*
 
 class PropertiesDocumentationProvider : AbstractDocumentationProvider() {
@@ -24,8 +23,8 @@ class PropertiesDocumentationProvider : AbstractDocumentationProvider() {
 	private fun getPropertyInfo(property: Property): String {
 		return buildString {
 			append(DocumentationMarkup.DEFINITION_START)
-			renderLocationString(this, property)
-			renderPropertyKey(this, property)
+			this.renderLocationString(property)
+			this.renderPropertyKey(property)
 			append(DocumentationMarkup.DEFINITION_END)
 		}
 	}
@@ -33,27 +32,27 @@ class PropertiesDocumentationProvider : AbstractDocumentationProvider() {
 	private fun getPropertyDoc(property: Property): String {
 		return buildString {
 			append(DocumentationMarkup.DEFINITION_START)
-			renderLocationString(this, property)
-			renderPropertyKey(this, property)
+			renderLocationString(property)
+			renderPropertyKey(property)
 			append(DocumentationMarkup.DEFINITION_END)
 			append(DocumentationMarkup.CONTENT_START)
-			renderPropertyValue(this, property)
+			renderPropertyValue(property)
 			append(DocumentationMarkup.CONTENT_END)
 		}
 	}
 	
-	private fun renderLocationString(builder: StringBuilder, element: PsiElement) {
+	private fun StringBuilder.renderLocationString(element: PsiElement) {
 		val file = element.containingFile ?: return
-		builder.append("[").append(file.name).append("]<br>")
+		append("[").append(file.name).append("]<br>")
 	}
 	
-	private fun renderPropertyKey(builder: StringBuilder, property: Property) {
+	private fun StringBuilder.renderPropertyKey(property: Property) {
 		val key = property.name ?: return
-		builder.append("<b>").append(key).append("</b>")
+		append("<b>").append(key).append("</b>")
 	}
 	
-	private fun renderPropertyValue(builder: StringBuilder, property: Property) {
+	private fun StringBuilder.renderPropertyValue(property: Property) {
 		val value = property.value ?: return
-		builder.append(value.handleHtmlI18nPropertyValue())
+		append(value.handleHtmlI18nPropertyValue())
 	}
 }
