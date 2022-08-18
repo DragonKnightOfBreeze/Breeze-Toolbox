@@ -22,37 +22,34 @@ class PropertiesDocumentationProvider : AbstractDocumentationProvider() {
 	
 	private fun getPropertyInfo(property: Property): String {
 		return buildString {
-			append(DocumentationMarkup.DEFINITION_START)
-			this.renderLocationString(property)
-			this.renderPropertyKey(property)
-			append(DocumentationMarkup.DEFINITION_END)
+			buildPropertyDefinition(property)
 		}
 	}
 	
 	private fun getPropertyDoc(property: Property): String {
 		return buildString {
-			append(DocumentationMarkup.DEFINITION_START)
-			renderLocationString(property)
-			renderPropertyKey(property)
-			append(DocumentationMarkup.DEFINITION_END)
-			append(DocumentationMarkup.CONTENT_START)
-			renderPropertyValue(property)
-			append(DocumentationMarkup.CONTENT_END)
+			buildPropertyDefinition(property)
+			buildPropertyContent(property)
 		}
 	}
 	
-	private fun StringBuilder.renderLocationString(element: PsiElement) {
-		val file = element.containingFile ?: return
-		append("[").append(file.name).append("]<br>")
+	private fun StringBuilder.buildPropertyDefinition(property: Property){
+		val file = property.containingFile
+		if(file != null){
+			val fileName = file.name
+			grayed {
+				append("[").append(fileName.escapeXml()).append("]")
+			}
+			append("<br>")
+		}
+		val key = property.name ?: anonymousString
+		append("<b>").append(key.escapeXml()).append("</b>")
 	}
 	
-	private fun StringBuilder.renderPropertyKey(property: Property) {
-		val key = property.name ?: return
-		append("<b>").append(key).append("</b>")
-	}
-	
-	private fun StringBuilder.renderPropertyValue(property: Property) {
-		val value = property.value ?: return
-		append(value.handleHtmlI18nPropertyValue())
+	private fun StringBuilder.buildPropertyContent(property: Property){
+		val value = property.value
+		if(value != null) {
+			append(value.handleHtmlI18nPropertyValue())
+		}
 	}
 }
