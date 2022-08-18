@@ -12,7 +12,7 @@ import icu.windea.breeze.toolbox.*
 import org.jetbrains.uast.*
 
 class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
-	override fun getName() = BreezeBundle.getMessage("gutterIcon.i18nMessage")
+	override fun getName() = BreezeBundle.message("gutterIcon.i18nMessage")
 	
 	override fun getIcon() = BreezeIcons.Gutter.I18nMessage
 	
@@ -28,9 +28,22 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 			val targetElement = expression.sourcePsi?.firstChild ?: continue
 			if(!expression.isI18nProperty()) continue
 			val property = expression.getI18nProperty() ?: continue
-			val text = buildText(property) ?: continue
+			val text = buildText(property)
 			val lineMarkerInfo = createLineMarkerInfo(targetElement, text, property)
 			result.add(lineMarkerInfo)
+		}
+	}
+	
+	private fun buildText(property: IProperty): String{
+		val key = property.name ?: anonymousString
+		val value = property.value
+		return buildString {
+			append("<code><b>").append(key).append("</b></code>")
+			if(value != null) {
+				append("<p>")
+				append(value.handleHtmlI18nPropertyValue())
+				append("</p>")
+			}
 		}
 	}
 	
@@ -44,18 +57,5 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 			GutterIconRenderer.Alignment.RIGHT,
 			{ name }
 		)
-	}
-	
-	private fun buildText(property: IProperty): String?{
-		val key = property.name ?: anonymousString
-		val value = property.value
-		return buildString {
-			append("<b>").append(key).append("</b>")
-			if(value != null) {
-				append("<p style='margin-top:2pt;border-top:thin solid #${ColorUtil.toHex(HintUtil.INFORMATION_BORDER_COLOR)};'")
-				append(value.handleHtmlI18nPropertyValue())
-				append("</p>")
-			}
-		}
 	}
 }

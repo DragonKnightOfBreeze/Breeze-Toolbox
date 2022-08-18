@@ -33,23 +33,26 @@ class PropertiesDocumentationProvider : AbstractDocumentationProvider() {
 		}
 	}
 	
-	private fun StringBuilder.buildPropertyDefinition(property: Property){
-		val file = property.containingFile
-		if(file != null){
-			val fileName = file.name
-			grayed {
-				append("[").append(fileName.escapeXml()).append("]")
-			}
-			append("<br>")
-		}
+	private fun StringBuilder.buildPropertyDefinition(property: Property) {
+		val fileName = property.containingFile?.name
 		val key = property.name ?: anonymousString
-		append("<b>").append(key.escapeXml()).append("</b>")
+		definition {
+			if(fileName != null) {
+				grayed {
+					append("[").append(fileName.escapeXml()).append("]")
+				}
+				append("<br>")
+			}
+			append("<b>").append(key.escapeXml())
+		}
 	}
 	
-	private fun StringBuilder.buildPropertyContent(property: Property){
+	private fun StringBuilder.buildPropertyContent(property: Property) {
 		val value = property.value
 		if(value != null) {
-			append(value.handleHtmlI18nPropertyValue())
+			content {
+				append(value.handleHtmlI18nPropertyValue())
+			}
 		}
 	}
 }
