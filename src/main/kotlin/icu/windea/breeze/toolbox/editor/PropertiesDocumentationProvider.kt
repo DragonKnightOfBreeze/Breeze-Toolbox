@@ -43,7 +43,7 @@ class PropertiesDocumentationProvider : AbstractDocumentationProvider() {
 				}
 				append("<br>")
 			}
-			append("<b>").append(key.escapeXml())
+			append(key.escapeXml())
 		}
 	}
 	

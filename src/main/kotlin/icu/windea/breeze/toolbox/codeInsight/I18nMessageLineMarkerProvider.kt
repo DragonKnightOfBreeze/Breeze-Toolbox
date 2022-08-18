@@ -38,8 +38,9 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 		val key = property.name ?: anonymousString
 		val value = property.value
 		return buildString {
-			append("<code><b>").append(key).append("</b></code>")
+			append("<p><code>").append(key).append("</code></p>")
 			if(value != null) {
+				append("<hr>")
 				append("<p>")
 				append(value.handleHtmlI18nPropertyValue())
 				append("</p>")
