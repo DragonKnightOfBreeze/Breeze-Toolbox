@@ -6,6 +6,7 @@ import com.intellij.lang.documentation.*
 import com.intellij.lang.properties.*
 import com.intellij.openapi.util.*
 import com.intellij.openapi.util.text.*
+import com.intellij.psi.PsiElement
 import com.intellij.util.*
 import org.jetbrains.annotations.*
 import org.jetbrains.uast.*
@@ -65,6 +66,13 @@ inline fun StringBuilder.grayed(block: StringBuilder.() -> Unit): StringBuilder 
 }
 
 fun String.escapeXml() = if(this.isEmpty()) "" else StringUtil.escapeXmlEntities(this)
+
+fun PsiElement.firstLeafOrSelf() : PsiElement? {
+	var current = this
+	while(true){
+		current = current.firstChild ?: return current
+	}
+}
 //endregion
 
 //region Project Extensions

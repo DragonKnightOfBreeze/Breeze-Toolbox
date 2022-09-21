@@ -1,6 +1,7 @@
-package icu.windea.breeze.toolbox
+package icons
 
 import com.intellij.openapi.util.*
+import icu.windea.breeze.toolbox.*
 
 object BreezeIcons {
 	object Gutter {

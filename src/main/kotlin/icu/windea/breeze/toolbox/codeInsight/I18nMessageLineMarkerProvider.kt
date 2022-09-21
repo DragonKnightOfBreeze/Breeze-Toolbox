@@ -1,13 +1,12 @@
 package icu.windea.breeze.toolbox.codeInsight
 
 import com.intellij.codeInsight.daemon.*
-import com.intellij.codeInsight.daemon.impl.*
-import com.intellij.codeInsight.hint.HintUtil
 import com.intellij.lang.properties.*
 import com.intellij.openapi.editor.markup.*
 import com.intellij.openapi.progress.*
 import com.intellij.psi.*
-import com.intellij.ui.*
+import com.intellij.psi.util.*
+import icons.*
 import icu.windea.breeze.toolbox.*
 import org.jetbrains.uast.*
 
@@ -25,7 +24,7 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 		}
 		for(expression in expressions) {
 			ProgressManager.checkCanceled()
-			val targetElement = expression.sourcePsi?.firstChild ?: continue
+			val targetElement = expression.sourcePsi?.firstLeafOrSelf() ?: continue
 			if(!expression.isI18nProperty()) continue
 			val property = expression.getI18nProperty() ?: continue
 			val text = buildText(property)
