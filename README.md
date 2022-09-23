@@ -6,6 +6,7 @@ IDEA插件：自用工具箱。
 
 * [X] （Java&Kotlin）对于第一个参数是本地化文本的key的方法引用，可以折叠并显示对应的本地化文本（覆盖IDEA的默认实现）
   * 显示实际上会读取到的处理后的本地化文本
+  * 将会列出来自各个本地化文件的本地化文本
   * 实现：`icu.windea.btb.editor.I18nMessageFoldingBuilder`
   * 参考：`com.intellij.codeInspection.i18n.folding.PropertyFoldingBuilder`
 * [X] （Java&Kotlin）对于类型定义上注有`@I18nName`的变量引用，可以折叠并显示对应的本地化文本

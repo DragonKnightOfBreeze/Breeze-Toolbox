@@ -4,12 +4,14 @@ import com.intellij.codeInspection.i18n.*
 import com.intellij.codeInspection.i18n.folding.*
 import com.intellij.lang.documentation.*
 import com.intellij.lang.properties.*
+import com.intellij.lang.properties.psi.*
 import com.intellij.openapi.util.*
 import com.intellij.openapi.util.text.*
-import com.intellij.psi.PsiElement
+import com.intellij.psi.*
 import com.intellij.util.*
-import org.jetbrains.annotations.*
+import com.jetbrains.rd.util.*
 import org.jetbrains.uast.*
+import java.util.*
 import javax.swing.*
 
 //region Stdlib Extensions
@@ -67,9 +69,9 @@ inline fun StringBuilder.grayed(block: StringBuilder.() -> Unit): StringBuilder 
 
 fun String.escapeXml() = if(this.isEmpty()) "" else StringUtil.escapeXmlEntities(this)
 
-fun PsiElement.firstLeafOrSelf() : PsiElement? {
+fun PsiElement.firstLeafOrSelf(): PsiElement? {
 	var current = this
-	while(true){
+	while(true) {
 		current = current.firstChild ?: return current
 	}
 }
@@ -80,23 +82,93 @@ val anonymousString = "<anonymous>"
 
 val locationClass = BreezeBundle::class.java
 
-fun String.handleTruncatedI18nPropertyValue():String{
+fun String.handleTruncatedI18nPropertyValue(): String {
 	val index = indexOf("\\n")
 	val suffix = if(index == -1) "" else "..."
 	val truncatedValue = if(index == -1) this else substring(0, index)
-	return StringUtil.escapeXmlEntities(truncatedValue.replace("\\\n","")) + suffix
+	return StringUtil.escapeXmlEntities(truncatedValue.replace("\\\n", "")) + suffix
 }
 
 fun String.handleHtmlI18nPropertyValue(): String {
 	return StringUtil.escapeXmlEntities(replace("\\\n", "")).replace("\\n", "<br>")
 }
 
+private val NULL_PROPERTY: IProperty? = PropertyFoldingBuilder.NULL
+
+//com.intellij.codeInspection.i18n.folding.PropertyFoldingBuilder.isI18nProperty(org.jetbrains.uast.ULiteralExpression)
 fun ULiteralExpression.isI18nProperty(): Boolean {
-	return PropertyFoldingBuilder.isI18nProperty(this)
+	if(!isString) return false
+	val sourcePsi = sourcePsi ?: return false
+	val cachedProperty = sourcePsi.getUserData(BreezeKeys.i18nPropertyKey)
+	if(cachedProperty == NULL_PROPERTY) return false
+	if(cachedProperty != null) return true
+	val isI18n = JavaI18nUtil.mustBePropertyKey(this, null)
+	if(!isI18n) sourcePsi.putUserData(BreezeKeys.i18nPropertyKey, PropertyFoldingBuilder.NULL)
+	return isI18n
 }
 
+//com.intellij.codeInspection.i18n.folding.PropertyFoldingBuilder.getI18nProperty
 fun ULiteralExpression.getI18nProperty(): IProperty? {
-	return PropertyFoldingBuilder.getI18nProperty(this)
+	val literal = this
+	val sourcePsi = sourcePsi ?: return null
+	val property = sourcePsi.getUserData(BreezeKeys.i18nPropertyKey) as Property?
+	if(property === PropertyFoldingBuilder.NULL) return null
+	if(property != null && isValid(property, literal)) return property
+	if(literal.isI18nProperty()) {
+		val references = literal.injectedReferences
+		for(reference in references) {
+			if(reference is PsiPolyVariantReference) {
+				val results = reference.multiResolve(false)
+				for(result in results) {
+					val element = result.element
+					if(element is IProperty) {
+						sourcePsi.putUserData(BreezeKeys.i18nPropertyKey, element as IProperty)
+						return element
+					}
+				}
+			} else {
+				val element = reference.resolve()
+				if(element is IProperty) {
+					sourcePsi.putUserData(BreezeKeys.i18nPropertyKey, element as IProperty)
+					return element
+				}
+			}
+		}
+	}
+	return null
+}
+
+//fileName -> property
+fun ULiteralExpression.getI18nProperties(): Set<IProperty> {
+	val literal = this
+	if(literal.isI18nProperty()) {
+		val properties = mutableSetOf<IProperty>()
+		val references = literal.injectedReferences
+		for(reference in references) {
+			if(reference is PsiPolyVariantReference) {
+				val results = reference.multiResolve(false)
+				for(result in results) {
+					val element = result.element
+					if(element is IProperty) {
+						properties.add(element)
+					}
+				}
+			} else {
+				val element = reference.resolve()
+				if(element is IProperty) {
+					properties.add(element)
+				}
+			}
+		}
+		return properties
+	}
+	return emptySet()
+}
+
+private fun isValid(property: Property, literal: ULiteralExpression): Boolean {
+	if(!property.isValid) return false
+	val result = literal.evaluate()
+	return if(result !is String) false else StringUtil.unquoteString(result) == property.key
 }
 
 fun UCallExpression.isValidI18nStringMethod(literalExpression: ULiteralExpression): Boolean {
@@ -117,25 +189,25 @@ fun UCallExpression.isValidI18nStringMethod(literalExpression: ULiteralExpressio
 fun UCallExpression.formatI18nString(text: String): String {
 	val args = valueArguments
 	val callSourcePsi = sourcePsi
-	if(args.isNotEmpty()){
+	if(args.isNotEmpty()) {
 		val literalExpression = args[0]
-		if(literalExpression is ULiteralExpression && literalExpression.isI18nProperty()){
+		if(literalExpression is ULiteralExpression && literalExpression.isI18nProperty()) {
 			val count = JavaI18nUtil.getPropertyValueParamsMaxCount(literalExpression)
-			if(args.size == count + 1){
+			if(args.size == count + 1) {
 				var resultText = text
 				val replacementPositions = mutableListOf<Couple<Int>>()
-				for(i in 1..count){
+				for(i in 1..count) {
 					val arg = args[i]
 					var value = arg.evaluate()
-					if(value == null){
-						if(arg is UReferenceExpression){
+					if(value == null) {
+						if(arg is UReferenceExpression) {
 							val sourcePsi = arg.sourcePsi
-							value = "{${sourcePsi?.text?:"<error>"}}"
-						}else{
+							value = "{${sourcePsi?.text ?: "<error>"}}"
+						} else {
 							return callSourcePsi?.text ?: "<error>"
 						}
 					}
-					resultText = replacePlaceholder(text, "{" + (i-1) + "}", value.toString(), replacementPositions)
+					resultText = replacePlaceholder(text, "{" + (i - 1) + "}", value.toString(), replacementPositions)
 				}
 				return resultText
 			}
