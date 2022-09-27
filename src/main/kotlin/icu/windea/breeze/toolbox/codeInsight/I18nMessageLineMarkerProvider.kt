@@ -1,19 +1,24 @@
 package icu.windea.breeze.toolbox.codeInsight
 
 import com.intellij.codeInsight.daemon.*
+import com.intellij.codeInsight.hint.HintUtil
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.lang.properties.*
 import com.intellij.openapi.editor.markup.*
 import com.intellij.openapi.progress.*
 import com.intellij.psi.*
 import com.intellij.psi.util.*
+import com.intellij.ui.*
 import com.intellij.util.Function
 import icons.*
 import icu.windea.breeze.toolbox.*
 import org.jetbrains.uast.*
 import java.util.*
 
+private val SEPARATOR_COLOR = JBColor.namedColor("GutterTooltip.lineSeparatorColor", HintUtil.INFORMATION_BORDER_COLOR);
+
 class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
+	
 	override fun getName() = BreezeBundle.message("gutterIcon.i18nMessage")
 	
 	override fun getIcon() = BreezeIcons.Gutter.I18nMessage
@@ -36,20 +41,22 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 			val propertyName = properties.first().name
 			var appendHr = false
 			val tooltipText = buildString {
-				append("<code>$propertyName</code>")
-				append("<br><br>")
 				for(property in properties) {
 					val value = property.value ?: continue
-					val handledValue = value.handleHtmlI18nPropertyValue()
 					if(appendHr) {
-						append("<hr>")
+						append("<br>")
 					} else {
 						appendHr = true
 					}
 					val file = property.propertiesFile
-					if(file != null){
-						append("<font color='#808080'><code>(${file.name})</code></font>")
+					if(file != null) {
+						append("<p style='margin-bottom:2pt;border-bottom:thin solid #")
+						append(ColorUtil.toHex(SEPARATOR_COLOR))
+						append("'><code>")
+						append(propertyName).append(" <font color='#909090'>(").append(file.name).append(")</font>")
+						append("</code></p>")
 					}
+					val handledValue = value.handleHtmlI18nPropertyValue()
 					append("<p>")
 					append(handledValue)
 					append("</p>")
