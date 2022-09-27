@@ -64,8 +64,8 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 			}
 			val lineMarkerInfo = NavigationGutterIconBuilder.create(icon)
 				.setTooltipText(tooltipText)
+				.setPopupTitle(BreezeBundle.message("gutterIcon.i18nMessage.tooltip.title"))
 				.setTargets(properties.filterIsInstance<PsiElement>())
-				.setAlignment(GutterIconRenderer.Alignment.RIGHT)
 				.setNamer { BreezeBundle.message("gutterIcon.i18nMessage") }
 				.createLineMarkerInfo(locationElement)
 			result.add(lineMarkerInfo)
