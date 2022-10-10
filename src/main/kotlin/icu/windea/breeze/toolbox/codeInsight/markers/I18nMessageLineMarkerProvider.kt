@@ -1,23 +1,23 @@
-package icu.windea.breeze.toolbox.codeInsight
+package icu.windea.breeze.toolbox.codeInsight.markers
 
 import com.intellij.codeInsight.daemon.*
-import com.intellij.codeInsight.hint.HintUtil
-import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
-import com.intellij.lang.properties.*
-import com.intellij.openapi.editor.markup.*
+import com.intellij.codeInsight.navigation.*
 import com.intellij.openapi.progress.*
 import com.intellij.psi.*
-import com.intellij.psi.util.*
 import com.intellij.ui.*
-import com.intellij.util.Function
 import icons.*
 import icu.windea.breeze.toolbox.*
+import icu.windea.breeze.toolbox.codeInsight.*
 import org.jetbrains.uast.*
 import java.util.*
 
-private val SEPARATOR_COLOR = JBColor.namedColor("GutterTooltip.lineSeparatorColor", HintUtil.INFORMATION_BORDER_COLOR);
-
+/**
+ * UAST - 对于引用到本地化文本的地方，加上装订线图标，可以鼠标悬浮显示对应的本地化文本，可以鼠标点击导航到声明处
+ * * 显示实际上会读取到的处理后的本地化文本
+ */
+@Deprecated("DEPRECATED")
 class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
+	override fun isEnabledByDefault() = false
 	
 	override fun getName() = BreezeBundle.message("gutterIcon.i18nMessage")
 	
@@ -39,29 +39,7 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 				.sortedBy { it.propertiesFile?.locale == Locale.getDefault() }
 			if(properties.isEmpty()) continue
 			val propertyName = properties.first().name
-			var appendHr = false
-			val tooltipText = buildString {
-				for(property in properties) {
-					val value = property.value ?: continue
-					if(appendHr) {
-						append("<br>")
-					} else {
-						appendHr = true
-					}
-					val file = property.propertiesFile
-					if(file != null) {
-						append("<p style='margin-bottom:2pt;border-bottom:thin solid #")
-						append(ColorUtil.toHex(SEPARATOR_COLOR))
-						append("'><code>")
-						append(propertyName).append(" <font color='#909090'>(").append(file.name).append(")</font>")
-						append("</code></p>")
-					}
-					val handledValue = value.handleHtmlI18nPropertyValue()
-					append("<p>")
-					append(handledValue)
-					append("</p>")
-				}
-			}
+			val tooltipText = getI18nMessageTooltipText(properties, propertyName)
 			val lineMarkerInfo = NavigationGutterIconBuilder.create(icon)
 				.setTooltipText(tooltipText)
 				.setPopupTitle(BreezeBundle.message("gutterIcon.i18nMessage.tooltip.title"))

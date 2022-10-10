@@ -5,6 +5,9 @@ import com.intellij.lang.properties.psi.*
 import com.intellij.psi.*
 import icu.windea.breeze.toolbox.*
 
+/**
+ * Properties - 在本地化文本中换行时不自动缩进（覆盖IDEA的默认实现）
+ */
 class PropertiesDocumentationProvider : AbstractDocumentationProvider() {
 	override fun getQuickNavigateInfo(element: PsiElement, originalElement: PsiElement?): String? {
 		return when {
@@ -35,7 +38,7 @@ class PropertiesDocumentationProvider : AbstractDocumentationProvider() {
 	
 	private fun StringBuilder.buildPropertyDefinition(property: Property) {
 		val fileName = property.containingFile?.name
-		val key = property.name ?: anonymousString
+		val key = property.name ?: ANONYMOUS
 		definition {
 			if(fileName != null) {
 				grayed {

@@ -2,85 +2,13 @@ package icu.windea.breeze.toolbox
 
 import com.intellij.codeInspection.i18n.*
 import com.intellij.codeInspection.i18n.folding.*
-import com.intellij.lang.documentation.*
 import com.intellij.lang.properties.*
 import com.intellij.lang.properties.psi.*
 import com.intellij.openapi.util.*
 import com.intellij.openapi.util.text.*
 import com.intellij.psi.*
-import com.intellij.util.*
-import com.jetbrains.rd.util.*
+import com.intellij.ui.*
 import org.jetbrains.uast.*
-import java.util.*
-import javax.swing.*
-
-//region Stdlib Extensions
-fun String.quote(): String {
-	return '"' + this + '"'
-}
-
-fun String.unquote(): String {
-	return if(length >= 2 && startsWith('"') && endsWith('"')) substring(1, length - 1) else this
-}
-
-fun Icon.resize(width: Int, height: Int = width): Icon {
-	return IconUtil.toSize(this, width, height)
-}
-//endregion
-
-//region Intellij Extensions
-inline fun StringBuilder.definition(block: StringBuilder.() -> Unit): StringBuilder {
-	append(DocumentationMarkup.DEFINITION_START)
-	block(this)
-	append(DocumentationMarkup.DEFINITION_END)
-	return this
-}
-
-inline fun StringBuilder.content(block: StringBuilder.() -> Unit): StringBuilder {
-	append(DocumentationMarkup.CONTENT_START)
-	block(this)
-	append(DocumentationMarkup.CONTENT_END)
-	return this
-}
-
-inline fun StringBuilder.sections(block: StringBuilder.() -> Unit): StringBuilder {
-	append(DocumentationMarkup.SECTIONS_START)
-	block(this)
-	append(DocumentationMarkup.SECTIONS_END)
-	return this
-}
-
-@Suppress("NOTHING_TO_INLINE")
-inline fun StringBuilder.section(title: CharSequence, value: CharSequence): StringBuilder {
-	append(DocumentationMarkup.SECTION_HEADER_START)
-	append(title).append(" ")
-	append(DocumentationMarkup.SECTION_SEPARATOR).append("<p>")
-	append(value)
-	append(DocumentationMarkup.SECTION_END)
-	return this
-}
-
-inline fun StringBuilder.grayed(block: StringBuilder.() -> Unit): StringBuilder {
-	append(DocumentationMarkup.GRAYED_START)
-	block(this)
-	append(DocumentationMarkup.GRAYED_END)
-	return this
-}
-
-fun String.escapeXml() = if(this.isEmpty()) "" else StringUtil.escapeXmlEntities(this)
-
-fun PsiElement.firstLeafOrSelf(): PsiElement? {
-	var current = this
-	while(true) {
-		current = current.firstChild ?: return current
-	}
-}
-//endregion
-
-//region Project Extensions
-val anonymousString = "<anonymous>"
-
-val locationClass = BreezeBundle::class.java
 
 fun String.handleTruncatedI18nPropertyValue(): String {
 	val index = indexOf("\\n")
@@ -113,7 +41,7 @@ fun ULiteralExpression.getI18nProperty(): IProperty? {
 	val sourcePsi = sourcePsi ?: return null
 	val property = sourcePsi.getUserData(BreezeKeys.i18nPropertyKey) as Property?
 	if(property === PropertyFoldingBuilder.NULL) return null
-	if(property != null && isValid(property, literal)) return property
+	if(property != null && literal.isValidI18nKey(property)) return property
 	if(literal.isI18nProperty()) {
 		val references = literal.injectedReferences
 		for(reference in references) {
@@ -165,9 +93,9 @@ fun ULiteralExpression.getI18nProperties(): Set<IProperty> {
 	return emptySet()
 }
 
-private fun isValid(property: Property, literal: ULiteralExpression): Boolean {
+fun ULiteralExpression.isValidI18nKey(property: Property): Boolean {
 	if(!property.isValid) return false
-	val result = literal.evaluate()
+	val result = evaluate()
 	return if(result !is String) false else StringUtil.unquoteString(result) == property.key
 }
 
@@ -244,4 +172,32 @@ private fun replacePlaceholder(text: String, placeholder: String, replacement: S
 	} while(true)
 	return resultText
 }
-//endregion
+
+//TODO 考虑自动换行过长的本地化文本？
+fun getI18nMessageTooltipText(properties: List<IProperty>, propertyName: String?): String {
+	var appendHr = false
+	return buildString {
+		append("<html><body>")
+		for(property in properties) {
+			val value = property.value ?: return "# unresolved"
+			if(appendHr) {
+				append("<br>")
+			} else {
+				appendHr = true
+			}
+			val file = property.propertiesFile
+			if(file != null) {
+				append("<p style='margin-bottom:2pt;border-bottom:thin solid #")
+				append(ColorUtil.toHex(SEPARATOR_COLOR))
+				append("'><code>")
+				append(propertyName).append(" <font color='#909090'>(").append(file.name).append(")</font>")
+				append("</code></p>")
+			}
+			val handledValue = value.handleHtmlI18nPropertyValue()
+			append("<p>")
+			append(handledValue)
+			append("</p>")
+		}
+		append("</body></html>")
+	}
+}

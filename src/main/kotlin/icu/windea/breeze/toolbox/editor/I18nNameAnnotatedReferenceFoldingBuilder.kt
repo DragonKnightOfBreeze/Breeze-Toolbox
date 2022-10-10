@@ -17,6 +17,11 @@ import java.util.*
 
 //TODO 可自定义作用对象和标记注解
 
+/**
+ * UAST - 对于类型定义上注有`@I18nName`的变量引用，可以折叠并显示对应的本地化文本
+ * * 显示由`@I18nName`的`value`属性的值的对应名称的该类型的属性指定的本地化文本
+ * * 显示实际上会读取到的处理后的本地化文本
+ */
 class I18nNameAnnotatedReferenceFoldingBuilder : FoldingBuilderEx() {
 	override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
 		if(root !is PsiFile || quick || !isFoldingOn()) return emptyArray()
