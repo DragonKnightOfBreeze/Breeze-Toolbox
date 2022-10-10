@@ -39,7 +39,7 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 				.sortedBy { it.propertiesFile?.locale == Locale.getDefault() }
 			if(properties.isEmpty()) continue
 			val propertyName = properties.first().name
-			val tooltipText = getI18nMessageTooltipText(properties, propertyName)
+			val tooltipText = getI18nMessageTooltip(properties, propertyName)
 			val lineMarkerInfo = NavigationGutterIconBuilder.create(icon)
 				.setTooltipText(tooltipText)
 				.setPopupTitle(BreezeBundle.message("gutterIcon.i18nMessage.tooltip.title"))
