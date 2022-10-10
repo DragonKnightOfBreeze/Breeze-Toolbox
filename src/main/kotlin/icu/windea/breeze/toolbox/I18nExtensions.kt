@@ -174,7 +174,7 @@ private fun replacePlaceholder(text: String, placeholder: String, replacement: S
 }
 
 //TODO 考虑自动换行过长的本地化文本？
-fun getI18nMessageTooltipText(properties: List<IProperty>, propertyName: String?): String {
+fun getI18nMessageTooltip(properties: List<IProperty>, propertyName: String?): String {
 	var appendHr = false
 	return buildString {
 		append("<html><body>")
