@@ -64,16 +64,20 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 	}
 	
 	override fun getCollectorFor(file: PsiFile, editor: Editor, settings: Settings, sink: InlayHintsSink): InlayHintsCollector {
+		val offsets = mutableSetOf<Int>()
 		return object : FactoryInlayHintsCollector(editor) {
 			override fun collect(element: PsiElement, editor: Editor, sink: InlayHintsSink): Boolean {
-				return factory.collect(element, file, editor, settings, sink)
+				return factory.collect(element, file, editor, settings, sink, offsets)
 			}
 		}
 	}
 	
-	private fun PresentationFactory.collect(element: PsiElement, file: PsiFile, editor: Editor, settings: Settings, sink: InlayHintsSink): Boolean {
+	private fun PresentationFactory.collect(element: PsiElement, file: PsiFile, editor: Editor, settings: Settings, sink: InlayHintsSink, offsets: MutableSet<Int>): Boolean {
 		val expression = element.toUElementOfType<ULiteralExpression>() ?: return true
 		val sourcePsi = expression.sourcePsi ?: return true
+		val locationElement = getLocationElement(sourcePsi) ?: return true
+		val offset = locationElement.textRange.endOffset
+		if(!offsets.add(offset)) return true //不要在同一偏移处重复添加内嵌提示
 		if(!expression.isI18nProperty()) return true
 		//用户语言区域的本地化文本需要置顶
 		val properties = expression.getI18nProperties()
@@ -82,8 +86,6 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 		val elements = properties.filterIsInstance<PsiElement>().toTypedArray()
 		val propertyName = properties.first().name
 		val tooltip = getI18nMessageTooltip(properties, propertyName)
-		val locationElement = getLocationElement(sourcePsi) ?: return true
-		val offset = locationElement.textRange.endOffset
 		var hint: LightweightHint? = null
 		val project = file.project
 		val presentation = icon(BreezeIcons.Gutter.I18nMessage)
@@ -119,11 +121,11 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 				}
 			}
 		sink.addInlineElement(offset, false, presentation, false)
-		return false
+		return true
 	}
 	
 	private fun getLocationElement(sourcePsi: PsiElement): PsiElement? {
-		if(sourcePsi is LeafPsiElement) return null //用于去重
+		if(sourcePsi is LeafPsiElement) return null //sourcePsi不应该是叶子元素
 		val text = sourcePsi.text
 		val c1 = text.getOrNull(text.length - 1)
 		val c2 = text.getOrNull(text.length - 2)
