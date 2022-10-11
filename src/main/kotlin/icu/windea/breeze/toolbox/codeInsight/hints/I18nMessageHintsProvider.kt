@@ -92,15 +92,12 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 					override fun onHover(event: MouseEvent, translated: Point) {
 						if(hint?.isVisible != true) {
 							//使用自定义的方法显示提示 - 可以保持显示，以便进行参照和复制提示文本
-							hint = showTooltip(editor, event, tooltip)
+							hint = showTooltip(editor, settings, event, tooltip)
 						}
 					}
 					
 					override fun onHoverFinished() {
-						if(!settings.pinTooltip) {
-							hint?.hide()
-							hint = null
-						}
+				
 					}
 				})
 			}
@@ -122,7 +119,7 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 				}
 			}
 		sink.addInlineElement(offset, false, presentation, false)
-		return true
+		return false
 	}
 	
 	private fun getLocationElement(sourcePsi: PsiElement): PsiElement? {
@@ -142,7 +139,7 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 		}
 	}
 	
-	private fun showTooltip(editor: Editor, e: MouseEvent, @NlsContexts.HintText text: String): LightweightHint {
+	private fun showTooltip(editor: Editor, settings: Settings, e: MouseEvent, @NlsContexts.HintText text: String): LightweightHint {
 		val hint = run {
 			val label = HintUtil.createInformationLabel(text)
 			label.border = JBUI.Borders.empty(6, 6, 5, 6)
@@ -159,9 +156,11 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 		}
 		
 		val hintHint = HintManagerImpl.createHintHint(editor, point, hint, constraint)
-			.setExplicitClose(true)
-			.setShowImmediately(true)
-			.setContentActive(true)
+		hintHint.isShowImmediately = true
+		if(settings.pinTooltip){
+			hintHint.isExplicitClose = true
+			hintHint.isContentActive = true
+		}
 		val flags = HintManager.HIDE_BY_ESCAPE or HintManager.UPDATE_BY_SCROLLING
 		HintManagerImpl.getInstanceImpl().showEditorHint(hint, editor, point, flags, 0, false, hintHint)
 		return hint
