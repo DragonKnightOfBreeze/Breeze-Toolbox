@@ -1,15 +1,17 @@
-# 更新日志
+# Changelog
 
-## v0.2.1 (2022/11/04)
+## [Unreleased]
+
+## 0.2.1 - 2022/11/04
 
 * 支持IDEA版本：2022.2.3
 
-## v0.2
+## 0.2
 
 * 优化与BUG修复
 * 实现：`icu.windea.breeze.toolbox.codeInsight.hints.I18nMessageHintsProvider`
 
-## v0.1
+## 0.1
 
 * 实现：`icu.windea.breeze.toolbox.editor.I18nMessageFoldingBuilder`
 * 实现：`icu.windea.breeze.toolbox.editor.I18nNameAnnotatedReferenceFoldingBuilder`
