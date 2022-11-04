@@ -2,14 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.*
 
 plugins {
 	id("org.jetbrains.kotlin.jvm") version "1.7.0"
-	id("org.jetbrains.intellij") version "1.8.0"
+	id("org.jetbrains.intellij") version "1.9.0"
 }
 
 group = "icu.windea"
-version = "0.2.0"
+version = "0.2.1"
 
 intellij {
-	version.set("2022.2")
+	version.set("2022.3")
 	pluginName.set("Breeze Toolbox")
 	plugins.set(listOf("java", "java-i18n", "properties", "org.jetbrains.kotlin"))
 }
@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	//implementation("org.jetbrains.kotlin:kotlin-reflect")
 }
 
 sourceSets.main {
