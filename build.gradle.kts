@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.date
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	id("org.jetbrains.kotlin.jvm") version "1.7.0"
@@ -44,8 +45,14 @@ changelog {
 }
 
 tasks {
-	runIde {
-		systemProperties["idea.is.internal"] = true
+	withType<KotlinCompile> {
+		kotlinOptions {
+			jvmTarget = "11"
+			freeCompilerArgs = listOf("-Xjvm-default=all")
+		}
+	}
+	jar {
+		from("README.md", "LICENSE")
 	}
 	patchPluginXml {
 		sinceBuild.set("222")
@@ -55,11 +62,11 @@ tasks {
 		changeNotes.set(provider {
 			changelog.renderItem(changelog.run {
 				getOrNull(version.get()) ?: getUnreleased()
-			}, Changelog.OutputType.MARKDOWN)
+			}, Changelog.OutputType.HTML)
 		})
 	}
-	jar {
-		from("README.md", "LICENSE")
+	runIde {
+		systemProperties["idea.is.internal"] = true
 	}
 	publishPlugin {
 		dependsOn("patchChangelog")

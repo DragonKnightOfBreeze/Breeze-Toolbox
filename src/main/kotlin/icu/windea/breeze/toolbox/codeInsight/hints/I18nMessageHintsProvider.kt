@@ -73,16 +73,16 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 	}
 	
 	private fun PresentationFactory.collect(element: PsiElement, file: PsiFile, editor: Editor, settings: Settings, sink: InlayHintsSink, offsets: MutableSet<Int>): Boolean {
-		val expression = element.toUElementOfType<ULiteralExpression>() ?: return true
+		val expression = element.toUElement(ULiteralExpression::class.java) ?: return true
 		val sourcePsi = expression.sourcePsi ?: return true
 		val locationElement = getLocationElement(sourcePsi) ?: return true
 		val offset = locationElement.textRange.endOffset
-		if(!offsets.add(offset)) return true //不要在同一偏移处重复添加内嵌提示
-		if(!expression.isI18nProperty()) return true
+		if (!offsets.add(offset)) return true //不要在同一偏移处重复添加内嵌提示
+		if (!expression.isI18nProperty()) return true
 		//用户语言区域的本地化文本需要置顶
 		val properties = expression.getI18nProperties()
 			.sortedBy { it.propertiesFile?.locale == Locale.getDefault() }
-		if(properties.isEmpty()) return true
+		if (properties.isEmpty()) return true
 		val elements = properties.filterIsInstance<PsiElement>().toTypedArray()
 		val propertyName = properties.first().name
 		val tooltip = getI18nMessageTooltip(properties, propertyName)
@@ -92,14 +92,14 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 			.let {
 				onHover(it, object : InlayPresentationFactory.HoverListener {
 					override fun onHover(event: MouseEvent, translated: Point) {
-						if(hint?.isVisible != true) {
+						if (hint?.isVisible != true) {
 							//使用自定义的方法显示提示 - 可以保持显示，以便进行参照和复制提示文本
 							hint = showTooltip(editor, settings, event, tooltip)
 						}
 					}
-					
+
 					override fun onHoverFinished() {
-				
+
 					}
 				})
 			}

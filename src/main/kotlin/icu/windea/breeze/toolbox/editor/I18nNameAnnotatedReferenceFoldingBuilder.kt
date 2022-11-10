@@ -114,13 +114,11 @@ class I18nNameAnnotatedReferenceFoldingBuilder : FoldingBuilderEx() {
 			}
 		}
 	}
-	
+
 	private fun createFoldingDescriptor(elementToFold: PsiElement, placeholder: String, set: HashSet<Any>): FoldingDescriptor {
 		val node = Objects.requireNonNull(elementToFold.node)
 		val textRange = elementToFold.textRange
-		val placeholderText = placeholder
-		val element = FoldingDescriptor(node, textRange, null, placeholderText, isFoldingOn(), set)
-		return element
+		return FoldingDescriptor(node, textRange, null, placeholder, isFoldingOn(), set)
 	}
 	
 	override fun getPlaceholderText(node: ASTNode): String? {

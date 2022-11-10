@@ -28,7 +28,7 @@ class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 	override fun collectSlowLineMarkers(elements: List<PsiElement>, result: MutableCollection<in LineMarkerInfo<*>>) {
 		//可能会有重复，需要过滤
 		val expressions = elements.mapNotNullTo(mutableSetOf()) { element ->
-			element.toUElementOfType<ULiteralExpression>()
+			element.toUElement(ULiteralExpression::class.java)
 		}
 		for(expression in expressions) {
 			ProgressManager.checkCanceled()
