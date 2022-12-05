@@ -4,16 +4,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	id("org.jetbrains.kotlin.jvm") version "1.7.0"
-	id("org.jetbrains.intellij") version "1.9.0"
+	id("org.jetbrains.intellij") version "1.10.0"
 	id("org.jetbrains.changelog") version "2.0.0"
 }
 
 group = "icu.windea"
-version = "0.2.1"
+version = "0.2.2"
 
 intellij {
 	pluginName.set("Breeze Toolbox")
-	version.set("2022.2")
+	version.set("2022.3")
 	plugins.set(listOf("java", "java-i18n", "properties", "org.jetbrains.kotlin"))
 }
 
@@ -33,7 +33,7 @@ sourceSets.main {
 
 kotlin {
 	jvmToolchain {
-		languageVersion.set(JavaLanguageVersion.of(11))
+		languageVersion.set(JavaLanguageVersion.of(17))
 	}
 }
 
@@ -47,7 +47,7 @@ changelog {
 tasks {
 	withType<KotlinCompile> {
 		kotlinOptions {
-			jvmTarget = "11"
+			jvmTarget = "17"
 			freeCompilerArgs = listOf("-Xjvm-default=all")
 		}
 	}
@@ -55,7 +55,7 @@ tasks {
 		from("README.md", "LICENSE")
 	}
 	patchPluginXml {
-		sinceBuild.set("222")
+		sinceBuild.set("223")
 		untilBuild.set("")
 		pluginDescription.set(projectDir.resolve("DESCRIPTION.md").readText())
 		// Get the latest available change notes from the changelog file
