@@ -102,7 +102,7 @@ class I18nNameAnnotatedReferenceFoldingBuilder : FoldingBuilderEx() {
 				val placeholder = expression.evaluateString().toString().quote()
 				result.add(createFoldingDescriptor(elementToFold, placeholder, set))
 			}
-			//如果作为本地化文本的引用的字符串是方法参数，需要将其中的索引占位符替换为上下文表达式占位符
+			//如果作为本地化代码的字符串是方法参数，需要折叠整个方法，并将其中的索引占位符替换为上下文表达式占位符
 			parent is UCallExpression && parent.isValidI18nStringMethod(expression) -> {
 				val placeholder = parent.formatI18nString(text).quote()
 				result.add(createFoldingDescriptor(elementToFold, placeholder, set))

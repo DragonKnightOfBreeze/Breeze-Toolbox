@@ -17,7 +17,7 @@
     <codeFoldingOptionsProvider instance="icu.windea.breeze.toolbox.settings.BreezeCodeFoldingOptionsProvider"/>
 
     <enterHandlerDelegate implementation="icu.windea.breeze.toolbox.codeInsight.EnterInPropertiesFileHandler" order="first"/>
-    <codeInsight.inlayProvider language="UAST" implementationClass="icu.windea.breeze.toolbox.codeInsight.hints.I18nMessageHintsProvider"/>
+    <codeInsight.inlayProviderFactory implementation="icu.windea.breeze.toolbox.codeInsight.hints.I18nMessageHintsProviderFactory"/>
     <codeInsight.lineMarkerProvider language="UAST" implementationClass="icu.windea.breeze.toolbox.codeInsight.markers.I18nMessageLineMarkerProvider" order="first"/>
 
     <lang.documentationProvider language="Properties" implementationClass="icu.windea.breeze.toolbox.editor.PropertiesDocumentationProvider" order="first"/>

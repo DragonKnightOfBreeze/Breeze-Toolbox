@@ -99,16 +99,18 @@ fun ULiteralExpression.isValidI18nKey(property: Property): Boolean {
 	return if(result !is String) false else StringUtil.unquoteString(result) == property.key
 }
 
+//com.intellij.codeInspection.i18n.folding.PropertyFoldingBuilder.checkLiteral
 fun UCallExpression.isValidI18nStringMethod(literalExpression: ULiteralExpression): Boolean {
 	val sourceLiteralExpression = literalExpression.sourcePsi ?: return false
 	val args = valueArguments
 	if(args[0].sourcePsi == sourceLiteralExpression) {
 		sourcePsi ?: return false
 		val count = JavaI18nUtil.getPropertyValueParamsMaxCount(literalExpression)
-		if(args.size == 1 + count) {
-			val ok = args.all { arg -> arg.evaluate() != null || arg is UReferenceExpression }
-			if(ok) return true
-		}
+		if(args.size == 1 + count) return true //matched message argument size -> ok enoungth
+		//if(args.size == 1 + count) {
+		//	val ok = args.drop(1).all { arg -> arg is UReferenceExpression || arg.evaluate() != null }
+		//	if(ok) return true
+		//}
 	}
 	return false
 }
@@ -132,7 +134,8 @@ fun UCallExpression.formatI18nString(text: String): String {
 							val sourcePsi = arg.sourcePsi
 							value = "{${sourcePsi?.text ?: "<error>"}}"
 						} else {
-							return callSourcePsi?.text ?: "<error>"
+							value = "{${sourcePsi?.text ?: "<error>"}}"
+							//return callSourcePsi?.text ?: "<error>"
 						}
 					}
 					resultText = replacePlaceholder(text, "{" + (i - 1) + "}", value.toString(), replacementPositions)

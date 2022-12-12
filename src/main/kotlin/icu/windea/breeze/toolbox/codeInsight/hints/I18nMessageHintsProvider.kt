@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.*
 import com.intellij.openapi.util.*
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.*
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.uast.*
 import com.intellij.ui.*
 import com.intellij.ui.dsl.builder.*
@@ -37,16 +38,10 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 		var pinTooltip: Boolean = true
 	)
 	
-	private val uastMetaLanguage = UastMetaLanguage.findInstance(UastMetaLanguage::class.java)
-	
 	override val key: SettingsKey<Settings> = settingsKey
 	override val name: String = BreezeBundle.message("hint.i18nMessage.name")
 	override val description: String = BreezeBundle.message("hint.i18nMessage.description")
 	override val previewText: String? = null
-	
-	override fun isLanguageSupported(language: Language): Boolean {
-		return uastMetaLanguage.matchesLanguage(language)
-	}
 	
 	override fun createSettings(): Settings {
 		return Settings()
@@ -74,8 +69,7 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 	
 	private fun PresentationFactory.collect(element: PsiElement, file: PsiFile, editor: Editor, settings: Settings, sink: InlayHintsSink, offsets: MutableSet<Int>): Boolean {
 		val expression = element.toUElement(ULiteralExpression::class.java) ?: return true
-		val sourcePsi = expression.sourcePsi ?: return true
-		val locationElement = getLocationElement(sourcePsi) ?: return true
+		val locationElement = getLocationElement(expression) ?: return true
 		val offset = locationElement.textRange.endOffset
 		if (!offsets.add(offset)) return true //不要在同一偏移处重复添加内嵌提示
 		if (!expression.isI18nProperty()) return true
@@ -124,8 +118,19 @@ class I18nMessageHintsProvider : InlayHintsProvider<I18nMessageHintsProvider.Set
 		return true
 	}
 	
-	private fun getLocationElement(sourcePsi: PsiElement): PsiElement? {
+	private fun getLocationElement(expression: ULiteralExpression): PsiElement? {
+		//得到需要显示在其后面的PSI元素
+		//* 如果作为本地化代码的字符串是方法参数，需要放在整个方法之后
+		//* 否则放在字符串字面量闭合的单引号或双引号之后
+		val sourcePsi = expression.sourcePsi ?: return null
 		if(sourcePsi is LeafPsiElement) return null //sourcePsi不应该是叶子元素
+		val parent = expression.uastParent
+		if(parent is UCallExpression && parent.isValidI18nStringMethod(expression)) {
+			val callSourcePsi = parent.sourcePsi?: return null
+			val receiver = parent.receiver
+			val receiverSourcePsi = receiver?.sourcePsi
+			return receiverSourcePsi?.let { PsiTreeUtil.findCommonParent(callSourcePsi, it) } ?: callSourcePsi
+		}
 		val text = sourcePsi.text
 		val c1 = text.getOrNull(text.length - 1)
 		val c2 = text.getOrNull(text.length - 2)
