@@ -14,14 +14,15 @@ IDEA插件：自用工具箱。
   * 显示实际上会读取到的处理后的本地化文本
   * 实现：`icu.windea.btb.editor.I18nNameAnnotatedReferenceFoldingBuilder`
   * 参考：`com.intellij.codeInspection.i18n.folding.PropertyFoldingBuilder`
-* [X] ~~UAST - 对于引用到本地化文本的地方，加上装订线图标，可以鼠标悬浮显示对应的本地化文本，可以鼠标点击导航到声明处~~
+* [X] UAST - 对于引用到本地化文本的地方，加上装订线图标，可以鼠标悬浮显示对应的本地化文本，可以鼠标点击导航到声明处（默认不启用）
   * 显示实际上会读取到的处理后的本地化文本
   * 实现：`icu.windea.btb.editor.I18nMessageLineMarkerProvider`
 * [X] UAST - 对于引用到本地化文本的地方，在消息码之后加上嵌入图标，可以鼠标悬浮显示对应的本地化文本，可以鼠标点击导航到声明处
   * 显示实际上会读取到的处理后的本地化文本
+  * 分组列出所有的本地化文本
   * 实现：`icu.windea.breeze.toolbox.codeInsight.hints.I18nMessageHintsProvider`
 * [X] Properties - 渲染属性的文档注释（覆盖IDEA的默认实现）
   * 显示实际上会读取到的处理后的本地化文本
-  * 实现：`icu.windea.btb.editor.PropertiesDocumentationProvider`
+  * 实现：`icu.windea.breeze.toolbox.editor.PropertiesDocumentationProvider`
 * [X] Properties - 在本地化文本中换行时不自动缩进（覆盖IDEA的默认实现）
-  * 实现：`icu.windea.btb.editor.EnterInPropertiesFileHandler`
+  * 实现：`icu.windea.breeze.toolbox.editor.EnterInPropertiesFileHandler`

@@ -15,7 +15,6 @@ import java.util.*
  * UAST - 对于引用到本地化文本的地方，加上装订线图标，可以鼠标悬浮显示对应的本地化文本，可以鼠标点击导航到声明处
  * * 显示实际上会读取到的处理后的本地化文本
  */
-@Deprecated("DEPRECATED")
 class I18nMessageLineMarkerProvider : LineMarkerProviderDescriptor() {
 	override fun isEnabledByDefault() = false
 	
