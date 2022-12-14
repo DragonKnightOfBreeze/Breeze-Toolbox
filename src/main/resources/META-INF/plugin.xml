@@ -19,7 +19,7 @@
     <enterHandlerDelegate implementation="icu.windea.breeze.toolbox.codeInsight.EnterInPropertiesFileHandler" order="first"/>
     <codeInsight.inlayProviderFactory implementation="icu.windea.breeze.toolbox.codeInsight.hints.I18nMessageHintsProviderFactory"/>
     <codeInsight.lineMarkerProvider language="UAST" implementationClass="icu.windea.breeze.toolbox.codeInsight.markers.I18nMessageLineMarkerProvider" order="first"/>
-    <liveTemplateContext contextId="" implementation=""
+    
     <lang.documentationProvider language="Properties" implementationClass="icu.windea.breeze.toolbox.editor.PropertiesDocumentationProvider" order="first"/>
     <lang.foldingBuilder language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nNameAnnotatedReferenceFoldingBuilder" order="first"/>
     <lang.foldingBuilder language="UAST" implementationClass="icu.windea.breeze.toolbox.editor.I18nMessageFoldingBuilder" order="first"/>

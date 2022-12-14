@@ -26,3 +26,7 @@ IDEA插件：自用工具箱。
   * 实现：`icu.windea.breeze.toolbox.editor.PropertiesDocumentationProvider`
 * [X] Properties - 在本地化文本中换行时不自动缩进（覆盖IDEA的默认实现）
   * 实现：`icu.windea.breeze.toolbox.editor.EnterInPropertiesFileHandler`
+
+# 计划中
+
+* 可以通过特定方式（如注解）为特定对象（如实现类、实例）提供本地化信息，附带提供装订线图标、代码折叠、内联提示等功能
