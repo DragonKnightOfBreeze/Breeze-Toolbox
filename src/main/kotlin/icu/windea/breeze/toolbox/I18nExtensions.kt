@@ -118,7 +118,7 @@ fun UCallExpression.isValidI18nStringMethod(literalExpression: ULiteralExpressio
 //com.intellij.codeInspection.i18n.folding.PropertyFoldingBuilder.format
 fun UCallExpression.formatI18nString(text: String): String {
 	val args = valueArguments
-	val callSourcePsi = sourcePsi
+	//val callSourcePsi = sourcePsi
 	if(args.isNotEmpty()) {
 		val literalExpression = args[0]
 		if(literalExpression is ULiteralExpression && literalExpression.isI18nProperty()) {
