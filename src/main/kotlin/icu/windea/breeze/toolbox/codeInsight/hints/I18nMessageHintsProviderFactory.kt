@@ -13,7 +13,7 @@ class I18nMessageHintsProviderFactory: InlayHintsProviderFactory {
 	}
 
 	override fun getProvidersInfoForLanguage(language: Language): List<InlayHintsProvider<out Any>> {
-		if(uastMetaLanguage.matchesLanguage(language)) return emptyList()
+		if(!uastMetaLanguage.matchesLanguage(language)) return emptyList()
 		return I18nMessageHintsProvider().let { listOf(it) }
 	}
 	
