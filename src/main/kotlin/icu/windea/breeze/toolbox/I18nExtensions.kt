@@ -14,7 +14,7 @@ fun String.handleTruncatedI18nPropertyValue(): String {
 	val index = indexOf("\\n")
 	val suffix = if(index == -1) "" else "..."
 	val truncatedValue = if(index == -1) this else substring(0, index)
-	return StringUtil.escapeXmlEntities(truncatedValue.replace("\\\n", "")) + suffix
+	return truncatedValue.replace("\\\n", "") + suffix
 }
 
 fun String.handleHtmlI18nPropertyValue(): String {
